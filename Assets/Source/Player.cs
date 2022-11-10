@@ -2,19 +2,11 @@ using UnityEngine;
 
 namespace Dasher
 {
+    [RequireComponent(typeof(InputHandler), typeof(CharacterController), typeof(Animator))]
     internal class Player : MonoBehaviour
     {
         [SerializeField]
-        private CharacterController characterController;
-
-        [SerializeField]
-        private Animator animator;
-
-        [SerializeField]
         private float speed = 1;
-
-        [SerializeField]
-        private float smoothTime = 1;
 
         [SerializeField]
         private float dashTime = 2;
@@ -25,10 +17,21 @@ namespace Dasher
         [SerializeField]
         private float rotationSpeed = 5;
 
+        private InputHandler inputHandler;
+        private CharacterController characterController;
+        private Animator animator;
+
         private float x, z;
         private float velocityX, velocityZ;
-        private float dashCurrentTime = 0;
+        private float dashCurrentTime;
         private bool dashing;
+
+        private void Awake()
+        {
+            inputHandler = GetComponent<InputHandler>();
+            characterController = GetComponent<CharacterController>();
+            animator = GetComponent<Animator>();
+        }
 
         private void Start()
         {
@@ -37,7 +40,7 @@ namespace Dasher
 
         private void Update()
         {
-            float mouseRotation = Input.GetAxis("Mouse X") * Time.deltaTime * rotationSpeed;
+            float mouseRotation = inputHandler.MouseAxisX * Time.deltaTime * rotationSpeed;
             transform.Rotate(Vector3.up, mouseRotation);
 
             if (dashing)
@@ -54,7 +57,7 @@ namespace Dasher
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.LeftShift))
+            if (inputHandler.DashPressed)
             {
                 dashing = true;
                 Move(new Vector3(0, 0, dashSpeed));
@@ -62,10 +65,8 @@ namespace Dasher
                 return;
             }
 
-            var localX = Input.GetAxis("Horizontal");
-            var localZ = Input.GetAxis("Vertical");
-            x = Mathf.SmoothDamp(x, localX, ref velocityX, smoothTime);
-            z = Mathf.SmoothDamp(z, localZ, ref velocityZ, smoothTime);
+            var x = inputHandler.HorizontalSmoothAxis;
+            var z = inputHandler.VerticalSmoothAxis;
 
             animator.SetFloat("VelocityX", x);
             animator.SetFloat("VelocityZ", z);
