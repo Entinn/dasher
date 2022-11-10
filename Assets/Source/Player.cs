@@ -17,12 +17,19 @@ namespace Dasher
         [SerializeField]
         private float rotationSpeed = 5;
 
+        [SerializeField]
+        private Renderer changeColorMaterial;
+
         private InputHandler inputHandler;
         private CharacterController characterController;
         private Animator animator;
 
-        private float dashCurrentTime;
-        private bool dashing;
+        private Timer dashTimer;
+        private Timer damageTakenTimer;
+
+        private Vector3 dashDirection;
+
+        private Color baseRendererColor;
 
         private void Awake()
         {
@@ -33,33 +40,40 @@ namespace Dasher
 
         private void Start()
         {
-            Camera.main.transform.SetParent(transform);
+            Camera.main.transform.SetParent(transform, false);
+            Cursor.visible = false;
+
+            dashTimer = new Timer(dashTime);
+            dashTimer.OnActivityChanged += x => animator.SetBool("Dash", x);
+
+            damageTakenTimer = new Timer(2);
+            damageTakenTimer.OnActivityChanged += ChangeCharacterColor;
+
+            baseRendererColor = changeColorMaterial.material.color;
+        }
+
+        private void ChangeCharacterColor(bool active)
+        {
+            changeColorMaterial.material.color = active ? Color.red : baseRendererColor;
         }
 
         private void Update()
         {
-            float mouseRotation = inputHandler.MouseAxisX * Time.deltaTime * rotationSpeed;
-            transform.Rotate(Vector3.up, mouseRotation);
+            Rotate();
 
-            if (dashing)
+            dashTimer.Service(Time.deltaTime);
+            damageTakenTimer.Service(Time.deltaTime);
+
+            if (inputHandler.DashPressed && !dashTimer.IsActive)
             {
-                Move(new Vector3(0, 0, dashSpeed));
-                dashCurrentTime += Time.deltaTime;
-                if (dashCurrentTime >= dashTime)
-                {
-                    dashCurrentTime = 0;
-                    dashing = false;
-                    animator.SetBool("Dash", dashing);
-                }
-
+                dashTimer.Start();
+                dashDirection = transform.TransformDirection(new Vector3(0, 0, dashSpeed));
                 return;
             }
 
-            if (inputHandler.DashPressed)
+            if (dashTimer.IsActive)
             {
-                dashing = true;
-                Move(new Vector3(0, 0, dashSpeed));
-                animator.SetBool("Dash", dashing);
+                Move(dashDirection, false);
                 return;
             }
 
@@ -72,9 +86,43 @@ namespace Dasher
             Move(new Vector3(x, 0, z));
         }
 
-        private void Move(Vector3 motion)
+        private void Rotate()
         {
-            characterController.Move(transform.TransformDirection(motion * (Time.deltaTime * speed)));
+            float mouseRotation = inputHandler.MouseAxisX * Time.deltaTime * rotationSpeed;
+            transform.Rotate(Vector3.up, mouseRotation);
+        }
+
+        private void Move(Vector3 motion, bool transformDirection = true)
+        {
+            var motionAccelerated = motion * (Time.deltaTime * speed);
+            if (transformDirection)
+                motionAccelerated = transform.TransformDirection(motionAccelerated);
+
+            characterController.Move(motionAccelerated);
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            if (!dashTimer.IsActive)
+                return;
+
+            var anotherPlayer = hit.gameObject.GetComponent<Player>();
+
+            if (anotherPlayer)
+                anotherPlayer.TakeDamage();
+        }
+
+        public void SetActiveInput(bool active)
+        {
+            inputHandler.SetActive(active);
+        }
+
+        public void TakeDamage()
+        {
+            if (damageTakenTimer.IsActive)
+                return;
+
+            damageTakenTimer.Start();
         }
     }
 }

@@ -1069,6 +1069,7 @@ MonoBehaviour:
   dashTime: 1
   dashSpeed: 5
   rotationSpeed: 150
+  changeColorMaterial: {fileID: 2749232806715078536}
 --- !u!114 &253215192217261118
 MonoBehaviour:
   m_ObjectHideFlags: 0
