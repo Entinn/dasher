@@ -21,8 +21,6 @@ namespace Dasher
         private CharacterController characterController;
         private Animator animator;
 
-        private float x, z;
-        private float velocityX, velocityZ;
         private float dashCurrentTime;
         private bool dashing;
 
