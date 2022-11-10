@@ -22,13 +22,24 @@ namespace Dasher
         [SerializeField]
         private float dashSpeed = 5;
 
+        [SerializeField]
+        private float rotationSpeed = 5;
+
         private float x, z;
         private float velocityX, velocityZ;
         private float dashCurrentTime = 0;
         private bool dashing;
 
+        private void Start()
+        {
+            Camera.main.transform.SetParent(transform);
+        }
+
         private void Update()
         {
+            float mouseRotation = Input.GetAxis("Mouse X") * Time.deltaTime * rotationSpeed;
+            transform.Rotate(Vector3.up, mouseRotation);
+
             if (dashing)
             {
                 characterController.Move(new Vector3(0, 0, dashSpeed) * (Time.deltaTime * speed));
