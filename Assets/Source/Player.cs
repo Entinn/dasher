@@ -42,7 +42,7 @@ namespace Dasher
 
             if (dashing)
             {
-                characterController.Move(new Vector3(0, 0, dashSpeed) * (Time.deltaTime * speed));
+                Move(new Vector3(0, 0, dashSpeed));
                 dashCurrentTime += Time.deltaTime;
                 if (dashCurrentTime >= dashTime)
                 {
@@ -54,6 +54,14 @@ namespace Dasher
                 return;
             }
 
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                dashing = true;
+                Move(new Vector3(0, 0, dashSpeed));
+                animator.SetBool("Dash", dashing);
+                return;
+            }
+
             var localX = Input.GetAxis("Horizontal");
             var localZ = Input.GetAxis("Vertical");
             x = Mathf.SmoothDamp(x, localX, ref velocityX, smoothTime);
@@ -62,14 +70,12 @@ namespace Dasher
             animator.SetFloat("VelocityX", x);
             animator.SetFloat("VelocityZ", z);
 
-            characterController.Move(new Vector3(x, 0, z) * (Time.deltaTime * speed));
+            Move(new Vector3(x, 0, z));
+        }
 
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                dashing = true;
-                characterController.Move(new Vector3(0, 0, dashSpeed) * (Time.deltaTime * speed));
-                animator.SetBool("Dash", dashing);
-            }
+        private void Move(Vector3 motion)
+        {
+            characterController.Move(transform.TransformDirection(motion * (Time.deltaTime * speed)));
         }
     }
 }
