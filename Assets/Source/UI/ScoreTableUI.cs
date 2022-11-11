@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Dasher
 {
     internal class ScoreTableUI : MonoBehaviour
     {
+        [SerializeField]
+        private Image background;
+
         [SerializeField]
         private TextMeshProUGUI scoreText;
 
@@ -14,9 +18,10 @@ namespace Dasher
         private void Start()
         {
             scoreText.gameObject.SetActive(false);
+            background.enabled = false;
         }
 
-        public void Update(Dictionary<string, int> score)
+        public void UpdateScore(IDictionary<string, int> score)
         {
             scoreItems.ForEach(x => Destroy(x.gameObject));
             scoreItems.Clear();
@@ -27,6 +32,8 @@ namespace Dasher
                 scoreItem.text = $"{player.Key}: {player.Value}";
                 scoreItems.Add(scoreItem);
             }
+
+            background.enabled = score.Count != 0;
         }
     }
 }
