@@ -40,15 +40,15 @@ namespace Dasher
             if (attacker.Score >= winScore)
             {
                 winnerText.SetWinner(attacker.Nickname);
-                StartCoroutine(WaitForRestart(winScreenTime));
+                StartCoroutine(WaitForRestart(winScreenTime, attacker));
             }
         }
 
-        IEnumerator WaitForRestart(float seconds)
+        IEnumerator WaitForRestart(float seconds, Player winner)
         {
             foreach (var player in Players)
             {
-                player.RpcSetActive(false);
+                player.RpcGameOver(player == winner);
             }
 
             yield return new WaitForSeconds(seconds);
@@ -62,7 +62,7 @@ namespace Dasher
                 Debug.Log($"Send {nameof(player.RpcSetNewPosition)} for player {player.Nickname}");
 #endif
                 player.RpcSetNewPosition(spawnPosition);
-                player.RpcSetActive(true);
+                player.RpcReleaseCharacter();
             }
         }
 

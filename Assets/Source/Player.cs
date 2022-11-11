@@ -191,16 +191,23 @@ namespace Dasher
         }
 
         [ClientRpc]
-        public void RpcSetActive(bool active)
+        public void RpcGameOver(bool win)
         {
-            this.active = active;
-            characterController.enabled = active;
-            if (!active)
-            {
-                animator.SetFloat("VelocityX", 0);
-                animator.SetFloat("VelocityZ", 0);
-                animator.SetBool("Dash", false);
-            }
+            this.active = false;
+            characterController.enabled = false;
+            animator.SetFloat("VelocityX", 0);
+            animator.SetFloat("VelocityZ", 0);
+            animator.SetBool("Win", win);
+            animator.SetBool("Lose", !win);
+        }
+
+        [ClientRpc]
+        public void RpcReleaseCharacter()
+        {
+            this.active = true;
+            characterController.enabled = true;
+            animator.SetBool("Win", false);
+            animator.SetBool("Lose", false);
         }
 
         private void OnDestroy()
