@@ -48,7 +48,7 @@ namespace Dasher
         {
             foreach (var player in Players)
             {
-                player.SetActive(false);
+                player.RpcSetActive(false);
             }
 
             yield return new WaitForSeconds(seconds);
@@ -58,8 +58,11 @@ namespace Dasher
             {
                 player.Score = 0;
                 var spawnPosition = networkManager.GetStartPosition().position;
-                player.SetNewPosition(spawnPosition);
-                player.SetActive(true);
+#if UNITY_EDITOR
+                Debug.Log($"Send {nameof(player.RpcSetNewPosition)} for player {player.Nickname}");
+#endif
+                player.RpcSetNewPosition(spawnPosition);
+                player.RpcSetActive(true);
             }
         }
 

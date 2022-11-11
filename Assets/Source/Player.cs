@@ -55,6 +55,7 @@ namespace Dasher
             CmdSetNickname(LoginUI.Nickname);
         }
 
+        //not the best way to do this, better make through authenticator overriding
         [Command]
         private void CmdSetNickname(string nickname)
         {
@@ -154,9 +155,9 @@ namespace Dasher
 #if UNITY_EDITOR
             Debug.Log($"Received {nameof(CmdTakeDamage)}");
 #endif
-
             var attacker = Main.Instance.GetPlayerByConnectionID(attackerNetId);
             var target = Main.Instance.GetPlayerByConnectionID(targetNetId);
+            //validation should be here
             if (target.damageTakenTimer.IsActive)
                 return;
 
@@ -179,16 +180,21 @@ namespace Dasher
             target.damageTakenTimer.Start();
         }
 
-        [TargetRpc]
-        public void SetNewPosition(Vector3 newPos)
+        [ClientRpc]
+        public void RpcSetNewPosition(Vector3 newPos)
         {
+#if UNITY_EDITOR
+            Debug.Log($"Received {nameof(RpcSetNewPosition)}: {newPos}");
+#endif
             GetComponent<NetworkTransform>().Reset();
             transform.position = newPos;
         }
 
-        public void SetActive(bool active)
+        [ClientRpc]
+        public void RpcSetActive(bool active)
         {
             this.active = active;
+            characterController.enabled = active;
             if (!active)
             {
                 animator.SetFloat("VelocityX", 0);
