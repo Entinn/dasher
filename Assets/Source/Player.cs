@@ -21,6 +21,12 @@ namespace Dasher
         [SerializeField]
         private Renderer changeColorMaterial;
 
+        [SyncVar(hook = nameof(UpdateScoreTable1))]
+        public string Nickname;
+
+        [SyncVar(hook = nameof(UpdateScoreTable2))]
+        public int Score;
+
         private InputHandler inputHandler;
         private CharacterController characterController;
         private Animator animator;
@@ -31,6 +37,8 @@ namespace Dasher
         private Vector3 dashDirection;
 
         private Color baseRendererColor;
+
+        private bool active = true;
 
         private void Awake()
         {
@@ -44,6 +52,13 @@ namespace Dasher
             base.OnStartLocalPlayer();
             Camera.main.transform.SetParent(transform, false);
             Cursor.visible = false;
+            CmdSetNickname(LoginUI.Nickname);
+        }
+
+        [Command]
+        private void CmdSetNickname(string nickname)
+        {
+            Nickname = nickname;
         }
 
         private void Start()
@@ -55,6 +70,8 @@ namespace Dasher
             damageTakenTimer.OnActivityChanged += ChangeCharacterColor;
 
             baseRendererColor = changeColorMaterial.material.color;
+
+            Main.Instance.AddPlayer(this);
         }
 
         private void ChangeCharacterColor(bool active)
@@ -67,7 +84,7 @@ namespace Dasher
             dashTimer.Service(Time.deltaTime);
             damageTakenTimer.Service(Time.deltaTime);
 
-            if (!isLocalPlayer)
+            if (!isLocalPlayer || !active)
                 return;
 
             Rotate();
@@ -109,37 +126,79 @@ namespace Dasher
             characterController.Move(motionAccelerated);
         }
 
+        [Client]
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (!dashTimer.IsActive || !isLocalPlayer)
+            if (!isLocalPlayer)
                 return;
 
             var anotherPlayer = hit.gameObject.GetComponent<Player>();
 
-            if (anotherPlayer)
-            {
-                if (anotherPlayer.damageTakenTimer.IsActive)
-                    return;
+            if (!dashTimer.IsActive || anotherPlayer == null || anotherPlayer.damageTakenTimer.IsActive)
+                return;
 
-                CmdTakeDamage(anotherPlayer, LoginUI.Nickname);
-            }
+            Debug.Log($"Sending {nameof(CmdTakeDamage)}");
+
+            //local simulation
+            if (!isServer)
+                anotherPlayer.damageTakenTimer.Start();
+
+            CmdTakeDamage(netId, anotherPlayer.netId);
         }
 
         [Command]
-        private void CmdTakeDamage(Player player, string attackerNickname)
+        private void CmdTakeDamage(uint attackerNetId, uint targetNetId)
         {
-            if (player.damageTakenTimer.IsActive)
+            Debug.Log($"Received {nameof(CmdTakeDamage)}");
+            var attacker = Main.Instance.GetPlayerByConnectionID(attackerNetId);
+            var target = Main.Instance.GetPlayerByConnectionID(targetNetId);
+            if (target.damageTakenTimer.IsActive)
                 return;
 
-            Main.Instance.AddScore(attackerNickname);
-            player.damageTakenTimer.Start();
-            player.TakeDamage();
+            Main.Instance.CmdAddScore(attackerNetId);
+            Debug.Log($"Sending {nameof(RpcTakeDamage)}");
+            RpcTakeDamage(targetNetId);
         }
 
         [ClientRpc]
-        private void TakeDamage()
+        private void RpcTakeDamage(uint targetNetId)
         {
-            damageTakenTimer.Start();
+            Debug.Log($"Received {nameof(RpcTakeDamage)}");
+            var target = Main.Instance.GetPlayerByConnectionID(targetNetId);
+            target.damageTakenTimer.Start();
+        }
+
+        [TargetRpc]
+        public void SetNewPosition(Vector3 newPos)
+        {
+            GetComponent<NetworkTransform>().Reset();
+            transform.position = newPos;
+        }
+
+        public void SetActive(bool active)
+        {
+            this.active = active;
+            if (!active)
+            {
+                animator.SetFloat("VelocityX", 0);
+                animator.SetFloat("VelocityZ", 0);
+                animator.SetBool("Dash", false);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            Main.Instance.RemovePlayer(this);
+        }
+
+        private void UpdateScoreTable1(string oldValue, string newValue)
+        {
+            Main.Instance.UpdateScore();
+        }
+
+        private void UpdateScoreTable2(int oldValue, int newValue)
+        {
+            Main.Instance.UpdateScore();
         }
     }
 }

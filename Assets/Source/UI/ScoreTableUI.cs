@@ -21,19 +21,19 @@ namespace Dasher
             background.enabled = false;
         }
 
-        public void UpdateScore(IDictionary<string, int> score)
+        public void UpdateScore(IReadOnlyList<Player> players)
         {
             scoreItems.ForEach(x => Destroy(x.gameObject));
             scoreItems.Clear();
 
-            foreach (var player in score)
+            foreach (var player in players)
             {
                 var scoreItem = scoreText.Clone();
-                scoreItem.text = $"{player.Key}: {player.Value}";
+                scoreItem.text = $"{player.Nickname}: {player.Score}";
                 scoreItems.Add(scoreItem);
             }
 
-            background.enabled = score.Count != 0;
+            background.enabled = players.Count != 0;
         }
     }
 }

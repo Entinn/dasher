@@ -23,7 +23,7 @@ namespace Dasher
             nickname.onValueChanged.AddListener(OnNicknameChanged);
 
             OnServerChanged("localhost");
-            OnNicknameChanged("player" + Random.Range(0, 10000));
+            OnNicknameChanged("player");
 
             host.AddSingleAction(OnHostPressed);
             connect.AddSingleAction(OnConnectPressed);

@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using UnityEngine;
 
@@ -5,45 +8,81 @@ namespace Dasher
 {
     internal class Main : NetworkBehaviour
     {
+        private readonly List<Player> players = new List<Player>();
+        public IReadOnlyList<Player> Players => players;
+
+        [SerializeField]
+        private NetworkManager networkManager;
+
+        [SerializeField]
+        private WinnerTextUI winnerText;
+
         [SerializeField]
         private ScoreTableUI scoreTableUI;
 
-        public static Main Instance { get; private set; }
+        [SerializeField]
+        private float winScreenTime = 5;
 
-        private readonly SyncDictionary<string, int> playersScore = new SyncDictionary<string, int>();
+        [SerializeField]
+        private int winScore = 3;
+
+        public static Main Instance { get; private set; }
 
         protected void Awake()
         {
             Instance = this;
         }
 
-        private void Start()
+        public void CmdAddScore(uint attackerNetId)
         {
-            playersScore.Callback += (a,b,c) => OnScoreUpdate();
-    
+            var attacker = GetPlayerByConnectionID(attackerNetId);
+            attacker.Score++;
+            if (attacker.Score >= winScore)
+            {
+                winnerText.SetWinner(attacker.Nickname);
+                StartCoroutine(WaitForRestart(winScreenTime));
+            }
         }
 
-        public void AddScore(string player)
+        IEnumerator WaitForRestart(float seconds)
         {
-            playersScore[player] += 1;
+            foreach (var player in Players)
+            {
+                player.SetActive(false);
+            }
+
+            yield return new WaitForSeconds(seconds);
+            winnerText.Clear();
+
+            foreach (var player in Players)
+            {
+                player.Score = 0;
+                var spawnPosition = networkManager.GetStartPosition().position;
+                player.SetNewPosition(spawnPosition);
+                player.SetActive(true);
+            }
         }
 
-        public override void OnStartClient()
+        public void AddPlayer(Player player)
         {
-            base.OnStartClient();
-            playersScore.Callback += (a,b,c) => OnScoreUpdate();
-            CmdAddNickname(LoginUI.Nickname);
+            players.Add(player);
+            UpdateScore();
         }
 
-        [Command(requiresAuthority = false)]
-        private void CmdAddNickname(string nickname)
+        public void RemovePlayer(Player player)
         {
-            playersScore.Add(nickname, 0);
+            players.Remove(player);
+            UpdateScore();
         }
 
-        private void OnScoreUpdate()
+        public void UpdateScore()
         {
-            scoreTableUI.UpdateScore(playersScore);
+            scoreTableUI?.UpdateScore(Players);
+        }
+
+        public Player GetPlayerByConnectionID(uint netId)
+        {
+            return Players.First(x => x.netId == netId);
         }
     }
 }
