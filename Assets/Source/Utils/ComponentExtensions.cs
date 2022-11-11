@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Dasher
 {
@@ -12,6 +14,12 @@ namespace Dasher
             transform.localScale = Vector3.one;
             item.gameObject.SetActive(setAcitve);
             return item;
+        }
+
+        public static void AddSingleAction(this Button button, Action action)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(action.Invoke);
         }
     }
 }
