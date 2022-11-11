@@ -137,7 +137,9 @@ namespace Dasher
             if (!dashTimer.IsActive || anotherPlayer == null || anotherPlayer.damageTakenTimer.IsActive)
                 return;
 
+#if UNITY_EDITOR
             Debug.Log($"Sending {nameof(CmdTakeDamage)}");
+#endif
 
             //local simulation
             if (!isServer)
@@ -149,21 +151,30 @@ namespace Dasher
         [Command]
         private void CmdTakeDamage(uint attackerNetId, uint targetNetId)
         {
+#if UNITY_EDITOR
             Debug.Log($"Received {nameof(CmdTakeDamage)}");
+#endif
+
             var attacker = Main.Instance.GetPlayerByConnectionID(attackerNetId);
             var target = Main.Instance.GetPlayerByConnectionID(targetNetId);
             if (target.damageTakenTimer.IsActive)
                 return;
 
             Main.Instance.CmdAddScore(attackerNetId);
+
+#if UNITY_EDITOR
             Debug.Log($"Sending {nameof(RpcTakeDamage)}");
+#endif
+
             RpcTakeDamage(targetNetId);
         }
 
         [ClientRpc]
         private void RpcTakeDamage(uint targetNetId)
         {
+#if UNITY_EDITOR
             Debug.Log($"Received {nameof(RpcTakeDamage)}");
+#endif
             var target = Main.Instance.GetPlayerByConnectionID(targetNetId);
             target.damageTakenTimer.Start();
         }
