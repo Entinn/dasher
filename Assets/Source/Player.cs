@@ -1,9 +1,10 @@
+using Mirror;
 using UnityEngine;
 
 namespace Dasher
 {
     [RequireComponent(typeof(InputHandler), typeof(CharacterController), typeof(Animator))]
-    internal class Player : MonoBehaviour
+    internal class Player : NetworkBehaviour
     {
         [SerializeField]
         private float speed = 1;
@@ -38,11 +39,15 @@ namespace Dasher
             animator = GetComponent<Animator>();
         }
 
-        private void Start()
+        public override void OnStartLocalPlayer()
         {
+            base.OnStartLocalPlayer();
             Camera.main.transform.SetParent(transform, false);
             Cursor.visible = false;
+        }
 
+        private void Start()
+        {
             dashTimer = new Timer(dashTime);
             dashTimer.OnActivityChanged += x => animator.SetBool("Dash", x);
 
@@ -59,10 +64,13 @@ namespace Dasher
 
         private void Update()
         {
-            Rotate();
-
             dashTimer.Service(Time.deltaTime);
             damageTakenTimer.Service(Time.deltaTime);
+
+            if (!isLocalPlayer)
+                return;
+
+            Rotate();
 
             if (inputHandler.DashPressed && !dashTimer.IsActive)
             {
@@ -103,25 +111,34 @@ namespace Dasher
 
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            if (!dashTimer.IsActive)
+            if (!dashTimer.IsActive || !isLocalPlayer)
                 return;
 
             var anotherPlayer = hit.gameObject.GetComponent<Player>();
 
             if (anotherPlayer)
-                anotherPlayer.TakeDamage();
+            {
+                if (anotherPlayer.damageTakenTimer.IsActive)
+                    return;
+
+                CmdTakeDamage(anotherPlayer, LoginUI.Nickname);
+            }
         }
 
-        public void SetActiveInput(bool active)
+        [Command]
+        private void CmdTakeDamage(Player player, string attackerNickname)
         {
-            inputHandler.SetActive(active);
-        }
-
-        public void TakeDamage()
-        {
-            if (damageTakenTimer.IsActive)
+            if (player.damageTakenTimer.IsActive)
                 return;
 
+            Main.Instance.AddScore(attackerNickname);
+            player.damageTakenTimer.Start();
+            player.TakeDamage();
+        }
+
+        [ClientRpc]
+        private void TakeDamage()
+        {
             damageTakenTimer.Start();
         }
     }
