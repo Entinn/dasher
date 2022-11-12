@@ -14,10 +14,10 @@ namespace Dasher
         private float speed = 1;
 
         [SerializeField]
-        private float dashTime = 2;
+        private float dashDistance = 10;
 
         [SerializeField]
-        private float dashSpeed = 5;
+        private float dashTravelTime = 1;
 
         [HideInInspector]
         [SyncVar(hook = nameof(UpdateScoreTable1))]
@@ -64,7 +64,7 @@ namespace Dasher
 
         private void Start()
         {
-            dashTimer = new Timer(dashTime);
+            dashTimer = new Timer(dashTravelTime);
             dashTimer.OnActivityChanged += x => animator.SetBool("Dash", x);
 
             damageTakenTimer = new Timer(2);
@@ -92,13 +92,13 @@ namespace Dasher
             if (inputHandler.DashPressed && !dashTimer.IsActive)
             {
                 dashTimer.Start();
-                dashDirection = transform.TransformDirection(new Vector3(0, 0, dashSpeed));
+                dashDirection = transform.TransformDirection(new Vector3(0, 0, 1));
                 return;
             }
 
             if (dashTimer.IsActive)
             {
-                Move(dashDirection, false);
+                Move(dashDirection, dashDistance / dashTravelTime, false);
                 return;
             }
 
@@ -108,10 +108,10 @@ namespace Dasher
             animator.SetFloat("VelocityX", x);
             animator.SetFloat("VelocityZ", z);
 
-            Move(new Vector3(x, 0, z));
+            Move(new Vector3(x, 0, z), speed);
         }
 
-        private void Move(Vector3 motion, bool transformDirection = true)
+        private void Move(Vector3 motion, float speed, bool transformDirection = true)
         {
             var motionAccelerated = motion * (Time.deltaTime * speed);
             if (transformDirection)
