@@ -9,8 +9,8 @@ namespace Dasher
     internal class Main : NetworkBehaviour
     {
         private readonly List<Player> players = new List<Player>();
-        public IReadOnlyList<Player> Players => players;
 
+        [Header("Links")]
         [SerializeField]
         private NetworkManager networkManager;
 
@@ -20,6 +20,7 @@ namespace Dasher
         [SerializeField]
         private ScoreTableUI scoreTableUI;
 
+        [Header("Settings")]
         [SerializeField]
         private float winScreenTime = 5;
 
@@ -46,7 +47,7 @@ namespace Dasher
 
         IEnumerator WaitForRestart(float seconds, Player winner)
         {
-            foreach (var player in Players)
+            foreach (var player in players)
             {
                 player.RpcGameOver(player == winner);
             }
@@ -54,7 +55,7 @@ namespace Dasher
             yield return new WaitForSeconds(seconds);
             winnerText.Clear();
 
-            foreach (var player in Players)
+            foreach (var player in players)
             {
                 player.Score = 0;
                 var spawnPosition = networkManager.GetStartPosition().position;
@@ -80,12 +81,12 @@ namespace Dasher
 
         public void UpdateScore()
         {
-            scoreTableUI?.UpdateScore(Players);
+            scoreTableUI?.UpdateScore(players);
         }
 
         public Player GetPlayerByConnectionID(uint netId)
         {
-            return Players.First(x => x.netId == netId);
+            return players.First(x => x.netId == netId);
         }
     }
 }

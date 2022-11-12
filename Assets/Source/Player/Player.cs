@@ -9,6 +9,7 @@ namespace Dasher
     [RequireComponent(typeof(SkinColorChanger))]
     internal class Player : NetworkBehaviour
     {
+        [Header("Settings")]
         [SerializeField]
         private float speed = 1;
 
@@ -21,9 +22,11 @@ namespace Dasher
         [SerializeField]
         private float rotationSpeed = 5;
 
+        [HideInInspector]
         [SyncVar(hook = nameof(UpdateScoreTable1))]
         public string Nickname;
 
+        [HideInInspector]
         [SyncVar(hook = nameof(UpdateScoreTable2))]
         public int Score;
 
