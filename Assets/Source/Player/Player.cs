@@ -3,7 +3,10 @@ using UnityEngine;
 
 namespace Dasher
 {
-    [RequireComponent(typeof(InputHandler), typeof(CharacterController), typeof(Animator))]
+    [RequireComponent(typeof(InputHandler))]
+    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(SkinColorChanger))]
     internal class Player : NetworkBehaviour
     {
         [SerializeField]
@@ -18,9 +21,6 @@ namespace Dasher
         [SerializeField]
         private float rotationSpeed = 5;
 
-        [SerializeField]
-        private Renderer changeColorMaterial;
-
         [SyncVar(hook = nameof(UpdateScoreTable1))]
         public string Nickname;
 
@@ -30,13 +30,12 @@ namespace Dasher
         private InputHandler inputHandler;
         private CharacterController characterController;
         private Animator animator;
+        private SkinColorChanger skinColorChanger;
 
         private Timer dashTimer;
         private Timer damageTakenTimer;
 
         private Vector3 dashDirection;
-
-        private Color baseRendererColor;
 
         private bool active = true;
 
@@ -45,6 +44,7 @@ namespace Dasher
             inputHandler = GetComponent<InputHandler>();
             characterController = GetComponent<CharacterController>();
             animator = GetComponent<Animator>();
+            skinColorChanger = GetComponent<SkinColorChanger>();
         }
 
         public override void OnStartLocalPlayer()
@@ -70,14 +70,15 @@ namespace Dasher
             damageTakenTimer = new Timer(2);
             damageTakenTimer.OnActivityChanged += ChangeCharacterColor;
 
-            baseRendererColor = changeColorMaterial.material.color;
-
             Main.Instance.AddPlayer(this);
         }
 
         private void ChangeCharacterColor(bool active)
         {
-            changeColorMaterial.material.color = active ? Color.red : baseRendererColor;
+            if (active)
+                skinColorChanger.SetColor(Color.red);
+            else
+                skinColorChanger.ReturnToStartColor();
         }
 
         private void Update()

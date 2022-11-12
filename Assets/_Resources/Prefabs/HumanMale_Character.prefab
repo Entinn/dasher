@@ -993,6 +993,7 @@ GameObject:
   - component: {fileID: 8009908117668765764}
   - component: {fileID: 7317855406694425192}
   - component: {fileID: 4842765396402654253}
+  - component: {fileID: 7422417495881437746}
   m_Layer: 0
   m_Name: HumanMale_Character
   m_TagString: Untagged
@@ -1074,7 +1075,8 @@ MonoBehaviour:
   dashTime: 1
   dashSpeed: 5
   rotationSpeed: 150
-  changeColorMaterial: {fileID: 2749232806715078536}
+  Nickname: 
+  Score: 0
 --- !u!114 &253215192217261118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1087,8 +1089,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f646b86cb3ac4db6a4f1c040d4df34b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
 --- !u!114 &8009908117668765764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1159,6 +1159,26 @@ MonoBehaviour:
   syncInterval: 0.1
   clientAuthority: 1
   animator: {fileID: 4540229000190281644}
+--- !u!114 &7422417495881437746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1782702501690864755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 492e9e4445624596a9875ef473f95ad0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  changeColorMaterials:
+  - {fileID: 723598234050729780}
+  - {fileID: 9206880669787365435}
+  - {fileID: 2749232806715078536}
+  - {fileID: 3721571313622080408}
+  - {fileID: 8848217695815792445}
+  - {fileID: 4917701622192142817}
+  - {fileID: 8943113169050733861}
 --- !u!1 &1789272960074739661
 GameObject:
   m_ObjectHideFlags: 0
