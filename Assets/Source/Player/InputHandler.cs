@@ -5,7 +5,7 @@ namespace Dasher
     internal class InputHandler : MonoBehaviour
     {
         public float MouseAxisX => Input.GetAxis("Mouse X");
-        public bool DashPressed => Input.GetKeyDown(KeyCode.LeftShift);
+        public bool DashPressed => Input.GetMouseButtonDown(0);
 
         public float HorizontalSmoothAxis => horizontalSmoothAxis;
         public float VerticalSmoothAxis => verticalSmoothAxis;
