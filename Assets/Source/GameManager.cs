@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Dasher
 {
-    internal class Main : NetworkBehaviour
+    internal class GameManager : NetworkBehaviour
     {
         private readonly List<Player> players = new List<Player>();
 
@@ -27,7 +27,7 @@ namespace Dasher
         [SerializeField]
         private int winScore = 3;
 
-        public static Main Instance { get; private set; }
+        public static GameManager Instance { get; private set; }
 
         protected void Awake()
         {

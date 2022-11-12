@@ -73,7 +73,7 @@ namespace Dasher
             damageTakenTimer = new Timer(2);
             damageTakenTimer.OnActivityChanged += ChangeCharacterColor;
 
-            Main.Instance.AddPlayer(this);
+            GameManager.Instance.AddPlayer(this);
         }
 
         private void ChangeCharacterColor(bool active)
@@ -159,13 +159,13 @@ namespace Dasher
 #if UNITY_EDITOR
             Debug.Log($"Received {nameof(CmdTakeDamage)}");
 #endif
-            var attacker = Main.Instance.GetPlayerByConnectionID(attackerNetId);
-            var target = Main.Instance.GetPlayerByConnectionID(targetNetId);
+            var attacker = GameManager.Instance.GetPlayerByConnectionID(attackerNetId);
+            var target = GameManager.Instance.GetPlayerByConnectionID(targetNetId);
             //validation should be here
             if (target.damageTakenTimer.IsActive)
                 return;
 
-            Main.Instance.CmdAddScore(attackerNetId);
+            GameManager.Instance.CmdAddScore(attackerNetId);
 
 #if UNITY_EDITOR
             Debug.Log($"Sending {nameof(RpcTakeDamage)}");
@@ -180,7 +180,7 @@ namespace Dasher
 #if UNITY_EDITOR
             Debug.Log($"Received {nameof(RpcTakeDamage)}");
 #endif
-            var target = Main.Instance.GetPlayerByConnectionID(targetNetId);
+            var target = GameManager.Instance.GetPlayerByConnectionID(targetNetId);
             target.damageTakenTimer.Start();
         }
 
@@ -216,17 +216,17 @@ namespace Dasher
 
         private void OnDestroy()
         {
-            Main.Instance.RemovePlayer(this);
+            GameManager.Instance.RemovePlayer(this);
         }
 
         private void UpdateScoreTable1(string oldValue, string newValue)
         {
-            Main.Instance.UpdateScore();
+            GameManager.Instance.UpdateScore();
         }
 
         private void UpdateScoreTable2(int oldValue, int newValue)
         {
-            Main.Instance.UpdateScore();
+            GameManager.Instance.UpdateScore();
         }
     }
 }
