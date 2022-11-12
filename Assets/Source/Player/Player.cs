@@ -19,9 +19,6 @@ namespace Dasher
         [SerializeField]
         private float dashSpeed = 5;
 
-        [SerializeField]
-        private float rotationSpeed = 5;
-
         [HideInInspector]
         [SyncVar(hook = nameof(UpdateScoreTable1))]
         public string Nickname;
@@ -92,8 +89,6 @@ namespace Dasher
             if (!isLocalPlayer || !active)
                 return;
 
-            Rotate();
-
             if (inputHandler.DashPressed && !dashTimer.IsActive)
             {
                 dashTimer.Start();
@@ -114,12 +109,6 @@ namespace Dasher
             animator.SetFloat("VelocityZ", z);
 
             Move(new Vector3(x, 0, z));
-        }
-
-        private void Rotate()
-        {
-            float mouseRotation = inputHandler.MouseAxisX * Time.deltaTime * rotationSpeed;
-            transform.Rotate(Vector3.up, mouseRotation);
         }
 
         private void Move(Vector3 motion, bool transformDirection = true)
@@ -197,7 +186,7 @@ namespace Dasher
         [ClientRpc]
         public void RpcGameOver(bool win)
         {
-            this.active = false;
+            active = false;
             characterController.enabled = false;
             animator.SetFloat("VelocityX", 0);
             animator.SetFloat("VelocityZ", 0);
@@ -208,7 +197,7 @@ namespace Dasher
         [ClientRpc]
         public void RpcReleaseCharacter()
         {
-            this.active = true;
+            active = true;
             characterController.enabled = true;
             animator.SetBool("Win", false);
             animator.SetBool("Lose", false);
