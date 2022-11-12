@@ -29,8 +29,8 @@ namespace Dasher
 
         #region Singleton
 
+        public static bool InstanceIsNull => instance == null;
         private static GameManager instance;
-
         /// <summary>
         /// Dependency injection better than this
         /// </summary>

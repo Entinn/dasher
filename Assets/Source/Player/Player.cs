@@ -205,7 +205,8 @@ namespace Dasher
 
         private void OnDestroy()
         {
-            GameManager.Instance.RemovePlayer(this);
+            if (!GameManager.InstanceIsNull)
+                GameManager.Instance.RemovePlayer(this);
         }
 
         private void UpdateScoreTable1(string oldValue, string newValue)
