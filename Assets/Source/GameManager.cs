@@ -27,7 +27,10 @@ namespace Dasher
         [SerializeField]
         private int winScore = 3;
 
+        #region Singleton
+
         private static GameManager instance;
+
         /// <summary>
         /// Dependency injection better than this
         /// </summary>
@@ -49,6 +52,9 @@ namespace Dasher
             instance = this;
         }
 
+        #endregion
+
+        //already used from Command
         public void CmdAddScore(uint attackerNetId)
         {
             var attacker = GetPlayerByConnectionID(attackerNetId);
@@ -60,7 +66,7 @@ namespace Dasher
             }
         }
 
-        IEnumerator WaitForRestart(float seconds, Player winner)
+        private IEnumerator WaitForRestart(float seconds, Player winner)
         {
             foreach (var player in players)
             {
