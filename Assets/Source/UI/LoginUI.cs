@@ -1,3 +1,4 @@
+using Mirror;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,9 @@ namespace Dasher
 
         [SerializeField]
         private TMP_InputField server, nickname;
+
+        [SerializeField]
+        private GameObject panel;
 
         [SerializeField]
         private Button host, connect;
@@ -48,19 +52,22 @@ namespace Dasher
         private void OnHostPressed()
         {
             netManager.StartHost();
-            gameObject.SetActive(false);
         }
 
         private void OnConnectPressed()
         {
             netManager.StartClient();
-            gameObject.SetActive(false);
         }
 
         private void OnDestroy()
         {
             server.onValueChanged.RemoveAllListeners();
             nickname.onValueChanged.RemoveAllListeners();
+        }
+
+        private void Update()
+        {
+            panel.SetActive(!NetworkServer.active && !NetworkClient.active);
         }
     }
 }
