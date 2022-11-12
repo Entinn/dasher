@@ -27,11 +27,26 @@ namespace Dasher
         [SerializeField]
         private int winScore = 3;
 
-        public static GameManager Instance { get; private set; }
+        private static GameManager instance;
+        /// <summary>
+        /// Dependency injection better than this
+        /// </summary>
+        public static GameManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                    Debug.LogError("GameManager instance not initialized");
+                return instance;
+            }
+        }
 
         protected void Awake()
         {
-            Instance = this;
+            if (instance != null)
+                Debug.LogError("GameManager multiple instances in scene");
+
+            instance = this;
         }
 
         public void CmdAddScore(uint attackerNetId)
