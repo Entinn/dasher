@@ -23,8 +23,8 @@ namespace Dasher
             if (!target)
                 return;
 
-            currentX += Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime;
-            currentY -= Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
+            currentX += InputHandler.MouseAxisX * sensitivity * Time.deltaTime;
+            currentY -= InputHandler.MouseAxisY * sensitivity * Time.deltaTime;
 
             currentY = Mathf.Clamp(currentY, YMin, YMax);
 

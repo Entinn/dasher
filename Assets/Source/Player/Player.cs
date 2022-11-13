@@ -88,7 +88,7 @@ namespace Dasher
             if (!isLocalPlayer || !active)
                 return;
 
-            if (inputHandler.DashPressed && !dashTimer.IsActive)
+            if (InputHandler.DashPressed && !dashTimer.IsActive)
             {
                 dashTimer.Start();
                 dashDirection = transform.TransformDirection(new Vector3(0, 0, 1));

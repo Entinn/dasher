@@ -4,14 +4,12 @@ namespace Dasher
 {
     internal class InputHandler : MonoBehaviour
     {
-        public float MouseAxisX => Input.GetAxis("Mouse X");
-        public bool DashPressed => Input.GetMouseButtonDown(0);
+        public static float MouseAxisX => Input.GetAxis("Mouse X");
+        public static float MouseAxisY => Input.GetAxis("Mouse Y");
+        public static bool DashPressed => Input.GetMouseButtonDown(0);
 
-        public float HorizontalSmoothAxis => horizontalSmoothAxis;
-        public float VerticalSmoothAxis => verticalSmoothAxis;
-
-        private float horizontalSmoothAxis;
-        private float verticalSmoothAxis;
+        public float HorizontalSmoothAxis { get; private set; }
+        public float VerticalSmoothAxis { get; private set; }
 
         private float velocityHorizontal, velocityVertical;
         private const float SmoothTime = .1f;
@@ -20,8 +18,8 @@ namespace Dasher
         {
             var inputHorizontal = Input.GetAxis("Horizontal");
             var inputVertical = Input.GetAxis("Vertical");
-            horizontalSmoothAxis = Mathf.SmoothDamp(horizontalSmoothAxis, inputHorizontal, ref velocityHorizontal, SmoothTime);
-            verticalSmoothAxis = Mathf.SmoothDamp(verticalSmoothAxis, inputVertical, ref velocityVertical, SmoothTime);
+            HorizontalSmoothAxis = Mathf.SmoothDamp(HorizontalSmoothAxis, inputHorizontal, ref velocityHorizontal, SmoothTime);
+            VerticalSmoothAxis = Mathf.SmoothDamp(VerticalSmoothAxis, inputVertical, ref velocityVertical, SmoothTime);
         }
     }
 }
