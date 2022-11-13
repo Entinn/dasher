@@ -50,7 +50,7 @@ namespace Dasher
         public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
-            Camera.main.GetComponent<CameraFollow>().SetTarget(transform);
+            Camera.main.GetComponent<CameraMovement>().SetTarget(transform);
             CmdSetNickname(LoginUI.Nickname);
         }
 
