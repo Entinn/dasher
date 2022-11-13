@@ -51,7 +51,6 @@ namespace Dasher
         {
             base.OnStartLocalPlayer();
             Camera.main.GetComponent<CameraFollow>().SetTarget(transform);
-            Cursor.visible = false;
             CmdSetNickname(LoginUI.Nickname);
         }
 

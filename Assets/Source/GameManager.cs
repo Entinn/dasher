@@ -54,12 +54,6 @@ namespace Dasher
 
         #endregion
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Escape))
-                Cursor.visible = !Cursor.visible;
-        }
-
         //already used from Command
         public void CmdAddScore(uint attackerNetId)
         {

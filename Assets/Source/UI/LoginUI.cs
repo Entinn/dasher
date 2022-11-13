@@ -67,7 +67,7 @@ namespace Dasher
 
         private void Update()
         {
-            panel.SetActive(!NetworkServer.active && !NetworkClient.active);
+            panel.SetActive(!DasherNetManager.InGameNow);
         }
     }
 }
